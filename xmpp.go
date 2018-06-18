@@ -356,7 +356,8 @@ func (c *Client) init(o *Options) error {
 		for _, m := range f.Mechanisms.Mechanism {
 			if m == "X-OAUTH2" && o.OAuthToken != "" && o.OAuthScope != "" {
 				mechanism = m
-				// Oauth authentication: send base64-encoded \x00 user \x00 token.
+				// Oauth authentication: 
+				base64-encoded \x00 user \x00 token.
 				raw := "\x00" + user + "\x00" + o.OAuthToken
 				enc := make([]byte, base64.StdEncoding.EncodedLen(len(raw)))
 				base64.StdEncoding.Encode(enc, []byte(raw))
@@ -654,14 +655,19 @@ func (c *Client) Recv() (stanza interface{}, err error) {
 func (c *Client) Send(chat Chat) (n int, err error) {
 	var subtext = ``
 	var thdtext = ``
+	var elems = ``
 	if chat.Subject != `` {
 		subtext = `<subject>` + xmlEscape(chat.Subject) + `</subject>`
 	}
 	if chat.Thread != `` {
 		thdtext = `<thread>` + xmlEscape(chat.Thread) + `</thread>`
 	}
-
-	stanza := "<message to='%s' type='%s' id='%s' xml:lang='en'>" + subtext + "<body>%s</body>" + thdtext + "</message>"
+	if len(chat.OtherElem) > 0 {
+		b, _ := xml.Marshal(chat.OtherElem)
+		elems = string(b)
+	}
+	
+	stanza := "<message to='%s' type='%s' id='%s' xml:lang='en'>" + subtext + "<body>%s</body>" + thdtext + elems + "</message>"
 
 	return fmt.Fprintf(c.conn, stanza,
 		xmlEscape(chat.Remote), xmlEscape(chat.Type), cnonce(), xmlEscape(chat.Text))
