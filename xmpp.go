@@ -356,8 +356,7 @@ func (c *Client) init(o *Options) error {
 		for _, m := range f.Mechanisms.Mechanism {
 			if m == "X-OAUTH2" && o.OAuthToken != "" && o.OAuthScope != "" {
 				mechanism = m
-				// Oauth authentication: 
-				base64-encoded \x00 user \x00 token.
+				// Oauth authentication: base64-encoded \x00 user \x00 token.
 				raw := "\x00" + user + "\x00" + o.OAuthToken
 				enc := make([]byte, base64.StdEncoding.EncodedLen(len(raw)))
 				base64.StdEncoding.Encode(enc, []byte(raw))
